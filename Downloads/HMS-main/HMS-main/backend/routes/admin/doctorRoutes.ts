@@ -76,4 +76,53 @@ router.get('/doctors', protect, restrictToAdmin, async (req: AuthRequest, res: R
   }
 });
 
+// @route   PUT /api/admin/doctors/:id
+// @desc    Update a doctor's user and profile data by doctor_id (Admin Only)
+// @access  Private (Admin Only)
+router.put('/doctors/:id', protect, restrictToAdmin, async (req: AuthRequest, res: Response) => {
+  try {
+    const doctorId = req.params.id;
+    const { name, email, specialization, license, user_id } = req.body;
+
+    if (!user_id || !name || !email || !specialization) {
+        return res.status(400).json({ message: 'Missing required fields for update.' });
+    }
+
+    // 1. UPDATE USER TABLE (Name and Email)
+    const { data: updatedUser, error: userUpdateError } = await supabase
+      .from('User')
+      .update({ name, email })
+      .eq('user_id', user_id)
+      .select('name, email');
+
+    if (userUpdateError) throw userUpdateError;
+
+    // 2. UPDATE DOCTOR TABLE (Specialization and License)
+    const { data: updatedDoctor, error: doctorUpdateError } = await supabase
+      .from('Doctor')
+      .update({ specialization, license_number: license }) // Note: license_number is used in DB
+      .eq('doctor_id', doctorId) 
+      .select('specialization, license_number');
+
+    if (doctorUpdateError) throw doctorUpdateError;
+
+    // 3. Success Response (Combined for frontend refresh)
+    res.status(200).json({
+        id: doctorId,
+        name: updatedUser[0].name,
+        email: updatedUser[0].email,
+        specialization: updatedDoctor[0].specialization,
+        license: updatedDoctor[0].license_number
+    });
+
+  } catch (err: any) {
+    console.error('Admin Doctor PUT Error:', err);
+    // Unique constraint violation (e.g., trying to use an email already taken)
+    if (err.code === '23505') { 
+        return res.status(400).json({ message: 'Error: Email already in use.' });
+    }
+    res.status(500).json({ message: 'Server error: Failed to update doctor profile.' });
+  }
+});
+
 export default router;

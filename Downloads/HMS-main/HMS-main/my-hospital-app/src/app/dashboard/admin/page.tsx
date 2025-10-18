@@ -11,6 +11,7 @@ const adminNavLinks = [
     { name: 'Dashboard', href: '/dashboard/admin' },
     { name: 'User Management', href: '/dashboard/admin/doctors' },
     { name: 'Settings', href: '/dashboard/admin/settings' },
+    { name: 'Tickets/Feedback', href: '/dashboard/admin/support-tickets' },
 ];
 
 interface AdminProfile {

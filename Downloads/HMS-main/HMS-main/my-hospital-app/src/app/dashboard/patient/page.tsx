@@ -24,6 +24,7 @@ export default function PatientDashboard() {
   const navbarLinks = [
     { name: 'Appointments', href: '/dashboard/patient/appointments' },
     { name: 'Profile', href: '/dashboard/patient/profile' },
+    { name: 'Help/Feedback', href: '/dashboard/feedback' },
   ];
 
   useEffect(() => {

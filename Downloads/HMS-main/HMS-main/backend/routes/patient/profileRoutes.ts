@@ -5,6 +5,7 @@ import { supabase } from '../../db';
 
 const router = Router();
 
+
 // @route   GET /api/patient/profile
 // @desc    Get the profile of the authenticated patient
 // @access  Private

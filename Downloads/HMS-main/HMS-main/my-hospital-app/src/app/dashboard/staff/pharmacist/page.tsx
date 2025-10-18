@@ -21,6 +21,7 @@ export default function PharmacistDashboard() {
   // Updated navigation links: Only Dispensing/Billing
   const pharmacistNavLinks = [
     { name: 'Dispense & Bill', href: '/dashboard/staff/pharmacist/dispensary-management' },
+    { name: 'Help/Feedback', href: '/dashboard/feedback' },
   ];
 
   useEffect(() => {

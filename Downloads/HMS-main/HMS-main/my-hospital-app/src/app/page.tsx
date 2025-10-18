@@ -30,7 +30,7 @@ export default function LandingPage() {
               <p className="text-lg md:text-xl mb-6 leading-relaxed animate-fadeIn delay-300">
                 Providing world-class healthcare with compassion and dedication. Your well-being is at the heart of everything we do.
               </p>
-              <Link href="/contact" className="px-8 py-4 bg-blue-600 text-white font-semibold rounded-full text-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 animate-slideInUp delay-500">
+              <Link href="/login" className="px-8 py-4 bg-blue-600 text-white font-semibold rounded-full text-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 animate-slideInUp delay-500">
                 Book an Appointment
               </Link>
             </div>

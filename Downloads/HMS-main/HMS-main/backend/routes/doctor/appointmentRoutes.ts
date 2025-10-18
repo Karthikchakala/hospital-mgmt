@@ -24,11 +24,14 @@ router.get('/appointments', protect, async (req: AuthRequest, res: Response) => 
       return res.status(401).json({ message: 'User not authenticated' });
     }
 
+    const numericUserId = parseInt(userId);
+    if (isNaN(numericUserId)) { return res.status(400).json({ message: 'Invalid User ID format.' }); }
+
     // 1. Find the doctor_id from the Doctor table using the user_id
     const { data: doctorRecord, error: doctorError } = await supabase
       .from('Doctor')
       .select('doctor_id')
-      .eq('user_id', userId)
+      .eq('user_id', numericUserId)
       .single();
 
     if (doctorError || !doctorRecord) {
@@ -107,6 +110,7 @@ router.get('/patients', protect, async (req: AuthRequest, res: Response) => {
     const uniquePatientsMap = new Map();
     patientAppointments.forEach((appt: any) => {
       if (appt.Patient) {
+        // const patientData = appt.Patient;
         uniquePatientsMap.set(appt.patient_id, {
             patient_id: appt.patient_id,
             name: appt.Patient.name,
@@ -123,6 +127,55 @@ router.get('/patients', protect, async (req: AuthRequest, res: Response) => {
     console.error('Doctor Patients List Request Error:', err);
     res.status(500).json({ message: 'Server error' });
   }
+});
+
+const getDoctorId = async (userId: string) => {
+    // CRITICAL: Ensure the conversion to number is done for the DB query
+    const numericUserId = parseInt(userId); 
+    
+    // Assuming 'supabase' is correctly imported from '../db'
+    const { data } = await supabase
+        .from('Doctor')
+        .select('doctor_id')
+        .eq('user_id', numericUserId)
+        .single();
+    
+    return data?.doctor_id;
+};
+
+// @route   PUT /api/doctor/appointments/:appointmentId/complete
+// @desc    Marks a specific appointment as 'Completed'
+// @access  Private (Doctor Only)
+router.put('/appointments/:appointmentId/complete', protect, async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.id;
+        const appointmentId = req.params.appointmentId;
+
+        // CRITICAL: Ensure the doctor is only updating their OWN appointment
+        const doctorId = await getDoctorId(userId as string);
+        if (!doctorId) {
+            return res.status(403).json({ message: 'Doctor ID not found or unauthorized.' });
+        }
+
+        const { data: updatedAppt, error } = await supabase
+            .from('Appointments')
+            .update({ status: 'Completed' })
+            .eq('appointment_id', appointmentId)
+            .eq('doctor_id', doctorId) // Security filter: Must belong to this doctor
+            .select();
+
+        if (error) throw error;
+
+        if (!updatedAppt || updatedAppt.length === 0) {
+            return res.status(404).json({ message: 'Appointment not found or not assigned to this doctor.' });
+        }
+
+        res.status(200).json({ message: 'Appointment marked as completed.', appointment: updatedAppt[0] });
+
+    } catch (err: any) {
+        console.error('Appointment Completion Error:', err);
+        res.status(500).json({ message: 'Failed to complete appointment.' });
+    }
 });
 
 export default router;

@@ -11,7 +11,7 @@ export default function LabTechnicianDashboard() {
   const userName = 'Alice Clark'; 
   const technicianNavLinks = [
     { name: 'Results', href: '/dashboard/staff/lab-technician/results-management' },
-    // Add other relevant links here
+    { name: 'Help/Feedback', href: '/dashboard/feedback' },
   ];
 
   const TaskCard = ({ title, description, link, color }: { title: string, description: string, link: string, color: string }) => (

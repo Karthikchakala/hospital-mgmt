@@ -48,4 +48,74 @@ router.get('/logs', protect, restrictToAdmin, async (req: AuthRequest, res: Resp
     }
 });
 
+// @route   GET /api/admin/tickets
+// @desc    Get all support tickets and feedback from all users
+// @access  Private (Admin Only)
+router.get('/tickets', protect, restrictToAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+        // 1. Fetch Support Tickets (Urgent Issues)
+        const { data: tickets, error: ticketError } = await supabase
+            .from('SupportTickets')
+            .select(`
+                ticket_id,
+                type,
+                description,
+                status,
+                timestamp,
+                User!inner(name, email)
+            `)
+            .order('timestamp', { ascending: false });
+
+        if (ticketError) throw ticketError;
+
+        // 2. Fetch General Feedback (Suggestions)
+        const { data: feedback, error: feedbackError } = await supabase
+            .from('Feedback')
+            .select(`
+                feedback_id,
+                subject,
+                comments,
+                timestamp,
+                User!inner(name, email)
+            `)
+            .order('timestamp', { ascending: false });
+
+        if (feedbackError) throw feedbackError;
+
+        // 3. Format and combine the data for frontend display
+        const combinedData = [
+            // Map Support Tickets
+            ...(tickets || []).map((t: any) => ({
+                id: t.ticket_id,
+                type: 'Support Ticket',
+                subject: `${t.type} (Status: ${t.status})`,
+                content: t.description,
+                submitter: t.User?.[0]?.name || 'Deleted User',
+                email: t.User?.[0]?.email || 'N/A',
+                timestamp: t.timestamp,
+                status: t.status,
+                isUrgent: true,
+            })),
+            // Map General Feedback
+            ...(feedback || []).map((f: any) => ({
+                id: f.feedback_id,
+                type: 'Feedback',
+                subject: f.subject,
+                content: f.comments,
+                submitter: f.User?.[0]?.name || 'Deleted User',
+                email: f.User?.[0]?.email || 'N/A',
+                timestamp: f.timestamp,
+                status: 'Closed', // Assuming feedback is "closed" upon review
+                isUrgent: false,
+            })),
+        ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()); // Sort by newest first
+
+        res.status(200).json(combinedData);
+
+    } catch (err: any) {
+        console.error('Admin Ticket/Feedback Fetch Error:', err);
+        res.status(500).json({ message: 'Failed to fetch tickets/feedback.' });
+    }
+});
+
 export default router;
