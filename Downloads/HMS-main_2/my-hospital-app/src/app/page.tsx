@@ -43,11 +43,11 @@ export default function LandingPage() {
               <Image
                 src="/images/HMS.ico"
                 alt="Hospital Logo"
-                width={40}
-                height={40}
+                width={50}
+                height={50}
                 className="rounded-full object-cover"
               />
-              <span className="text-2xl font-extrabold tracking-tight text-cyan-300">
+              <span className="text-4xl font-extrabold tracking-tight text-cyan-300">
                 Hospify
               </span>
             </Link>
