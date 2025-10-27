@@ -118,7 +118,7 @@ export default function DoctorDashboard() {
       border: 'border-sky-400/30',
       glow: 'hover:shadow-sky-400/40',
       text: 'text-sky-200',
-      link: '/dashboard/help-feedback',
+      link: '/dashboard/feedback',
     },
   ];
 

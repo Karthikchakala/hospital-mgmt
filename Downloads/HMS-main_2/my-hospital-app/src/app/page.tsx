@@ -48,11 +48,18 @@ export default function LandingPage() {
                 className="rounded-full object-cover"
               />
               <span className="text-2xl font-extrabold tracking-tight text-cyan-300">
-                MediCare+
+                Hospify
               </span>
             </Link>
 
+
             <div className="hidden md:flex items-center gap-8 ml-auto text-[17px] font-medium">
+              <Link
+              href="/"
+              className="text-xl text-neutral-700 dark:text-neutral-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >
+              Home
+              </Link>
               {['About', 'Services', 'Contact'].map((item, i) => (
                 <Link
                   key={i}
@@ -124,7 +131,7 @@ export default function LandingPage() {
         {/* ===== PARTICLE ANIMATION AFTER HERO ONLY ===== */}
         <div className="relative overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <ParticlesBackground /> {/* ✅ only active for sections after hero */}
+            <ParticlesBackground />
           </div>
 
           {/* Signup Section */}

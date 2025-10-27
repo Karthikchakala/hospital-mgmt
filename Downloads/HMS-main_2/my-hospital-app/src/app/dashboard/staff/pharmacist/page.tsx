@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { PlusCircleIcon } from '@heroicons/react/24/outline';
+import { PlusCircleIcon, ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
 
 interface StaffProfile {
   name: string;
@@ -123,6 +123,14 @@ export default function PharmacistDashboard() {
               gradient="from-emerald-500/30 to-teal-500/30"
               borderColor="border-emerald-400"
               icon={PlusCircleIcon}
+            />
+            <TaskCard
+              title="Feedback & Help"
+              description="Share your thoughts to help us serve you better."
+              link="/dashboard/feedback"
+              gradient="from-pink-500/30 to-pink-500/30"
+              borderColor="border-pink-400"
+              icon={ClipboardDocumentListIcon}
             />
           </div>
         </main>

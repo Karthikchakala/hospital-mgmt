@@ -29,17 +29,12 @@ const restrictToAdmin = (req: AuthRequest, res: Response, next: NextFunction) =>
 // @access  Private (Admin Only)
 router.get('/logs', protect, restrictToAdmin, async (req: AuthRequest, res: Response) => {
     try {
-        // Fetch all logs, joining with the User table to display the user's name (optional join)
         const { data: logs, error } = await supabase
             .from('AuditLogs')
-            // NOTE: We select all columns from AuditLogs
             .select(`*`) 
-            .order('timestamp', { ascending: false }); // Show newest entries first
+            .order('timestamp', { ascending: false });
 
         if (error) throw error;
-
-        // In a complex app, you would fetch user names separately if needed for display.
-        // For now, we rely on the user_id stored in the log.
 
         res.status(200).json(logs);
     } catch (err: any) {
@@ -51,9 +46,10 @@ router.get('/logs', protect, restrictToAdmin, async (req: AuthRequest, res: Resp
 // @route   GET /api/admin/tickets
 // @desc    Get all support tickets and feedback from all users
 // @access  Private (Admin Only)
+
 router.get('/tickets', protect, restrictToAdmin, async (req: AuthRequest, res: Response) => {
     try {
-        // 1. Fetch Support Tickets (Urgent Issues)
+
         const { data: tickets, error: ticketError } = await supabase
             .from('SupportTickets')
             .select(`
@@ -68,7 +64,7 @@ router.get('/tickets', protect, restrictToAdmin, async (req: AuthRequest, res: R
 
         if (ticketError) throw ticketError;
 
-        // 2. Fetch General Feedback (Suggestions)
+
         const { data: feedback, error: feedbackError } = await supabase
             .from('Feedback')
             .select(`
@@ -82,32 +78,42 @@ router.get('/tickets', protect, restrictToAdmin, async (req: AuthRequest, res: R
 
         if (feedbackError) throw feedbackError;
 
-        // 3. Format and combine the data for frontend display
         const combinedData = [
-            // Map Support Tickets
-            ...(tickets || []).map((t: any) => ({
-                id: t.ticket_id,
-                type: 'Support Ticket',
-                subject: `${t.type} (Status: ${t.status})`,
-                content: t.description,
-                submitter: t.User?.[0]?.name || 'Deleted User',
-                email: t.User?.[0]?.email || 'N/A',
-                timestamp: t.timestamp,
-                status: t.status,
-                isUrgent: true,
-            })),
-            // Map General Feedback
-            ...(feedback || []).map((f: any) => ({
-                id: f.feedback_id,
-                type: 'Feedback',
-                subject: f.subject,
-                content: f.comments,
-                submitter: f.User?.[0]?.name || 'Deleted User',
-                email: f.User?.[0]?.email || 'N/A',
-                timestamp: f.timestamp,
-                status: 'Closed', // Assuming feedback is "closed" upon review
-                isUrgent: false,
-            })),
+
+            ...(tickets || []).map((t: any) => {
+                const user = Array.isArray(t.User) ? t.User[0] : t.User;
+                const submitterName = user?.name || 'Deleted User';
+                const submitterEmail = user?.email || 'N/A';
+
+                return {
+                    id: t.ticket_id,
+                    type: 'Support Ticket',
+                    subject: `${t.type} (Status: ${t.status})`,
+                    content: t.description,
+                    submitter: submitterName,
+                    email: submitterEmail,
+                    timestamp: t.timestamp,
+                    status: t.status,
+                    isUrgent: true,
+                };
+            }),
+            ...(feedback || []).map((f: any) => {
+                const user = Array.isArray(f.User) ? f.User[0] : f.User;
+                const submitterName = user?.name || 'Deleted User';
+                const submitterEmail = user?.email || 'N/A';
+
+                return {
+                    id: f.feedback_id,
+                    type: 'Feedback',
+                    subject: f.subject,
+                    content: f.comments,
+                    submitter: submitterName,
+                    email: submitterEmail,
+                    timestamp: f.timestamp,
+                    status: 'Closed',
+                    isUrgent: false,
+                };
+            }),
         ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()); // Sort by newest first
 
         res.status(200).json(combinedData);
@@ -115,6 +121,55 @@ router.get('/tickets', protect, restrictToAdmin, async (req: AuthRequest, res: R
     } catch (err: any) {
         console.error('Admin Ticket/Feedback Fetch Error:', err);
         res.status(500).json({ message: 'Failed to fetch tickets/feedback.' });
+    }
+});
+
+// @route   GET /api/admin/stats
+// @desc    Get key hospital statistics for the Admin dashboard
+// @access  Private (Admin Only)
+router.get('/stats', protect, restrictToAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+
+        const { data: doctors, error: docError } = await supabase
+        .from('User')
+        .select('user_id')
+        .eq('role', 'doctor');
+        if (docError) throw docError;
+        const totalDoctors = doctors?.length || 0;
+
+        const { data: patients, error: patientError } = await supabase
+        .from('User')
+        .select('user_id')
+        .eq('role', 'patient');
+        if (patientError) throw patientError;
+        const totalPatients = patients?.length || 0;
+
+        const { data: staff, error: staffError } = await supabase
+        .from('User')
+        .select('user_id')
+        .in('role', ['admin', 'staff']);
+        if (staffError) throw staffError;
+        const totalStaff = staff?.length || 0;
+
+        const { data: incomeData, error: incomeError } = await supabase
+            .from('Billing')   
+            .select('total_amount,status')
+            .eq('status', 'Paid'); 
+        
+        if (incomeError) throw incomeError;
+
+        const incomeGenerated = incomeData.reduce((sum, payment) => sum + (payment.total_amount || 0), 0);
+
+        res.status(200).json({
+            totalDoctors: totalDoctors || 0,
+            totalPatients: totalPatients || 0,
+            totalStaff: totalStaff || 0, 
+            incomeGenerated: parseFloat(incomeGenerated.toFixed(2)),
+        });
+
+    } catch (err: any) {
+        console.error('Admin Stats Fetch Error:', err);
+        res.status(500).json({ message: 'Failed to fetch dashboard statistics.' });
     }
 });
 

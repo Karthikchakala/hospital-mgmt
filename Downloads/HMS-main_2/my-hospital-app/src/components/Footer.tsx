@@ -28,7 +28,7 @@ export default function Footer() {
                 className="rounded-full border-2 border-cyan-300 shadow-cyan-500/25"
               />
               <span className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-cyan-400 to-blue-400 text-transparent bg-clip-text">
-                HEALTHCARE
+                HOSPIFY
               </span>
             </Link>
             <p className="text-slate-400 leading-relaxed">
@@ -80,9 +80,9 @@ export default function Footer() {
               Contact Info
             </h4>
             <ul className="space-y-2 text-slate-300">
-              <li>123 Hospital Lane, Health City, CA 12345</li>
-              <li>(123) 456-7890</li>
-              <li>info@healthcare.com</li>
+              <li>IIITDM Kurnool</li>
+              <li>+91 8328134131</li>
+              <li>info@hospify.com</li>
             </ul>
 
             {/* Social Media */}
@@ -108,7 +108,7 @@ export default function Footer() {
         {/* Divider Section */}
         <div className="mt-12 pt-6 border-t border-cyan-700/40 text-center text-slate-400 text-sm md:text-base">
           <p>
-            &copy; 2025 <span className="text-cyan-300 font-semibold">Healthcare</span>. All Rights Reserved.
+            &copy; 2025 <span className="text-cyan-300 font-semibold">Hospify</span>. All Rights Reserved.
           </p>
         </div>
       </div>

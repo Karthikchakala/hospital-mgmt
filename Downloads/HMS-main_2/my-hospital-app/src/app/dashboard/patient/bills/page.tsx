@@ -1,7 +1,6 @@
 'use client';
 
 import DashboardNavbar from '../../../../components/DashboardNavbar';
-import ParticlesBackground from '../../../../components/ParticlesBackground';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -117,7 +116,7 @@ export default function PatientBillsPage() {
                     email: userEmail,
                     contact: '8328134131'
                 },
-                theme: { color: '#06b6d4' }
+                theme: { color: '#0891b2' }
             };
 
             const rzp = new window.Razorpay(options);
@@ -140,9 +139,8 @@ export default function PatientBillsPage() {
     }
 
     return (
-        <div className="relative min-h-screen bg-slate-900 text-slate-100 overflow-hidden">
-            {/* Plexus Background */}
-            <ParticlesBackground />
+        <div className="relative min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800 text-slate-100">
+            {/* Removed Particles Background */}
 
             {/* Navigation */}
             <DashboardNavbar 
@@ -152,110 +150,85 @@ export default function PatientBillsPage() {
             />
 
             {/* Main Content */}
-            <main className="relative z-10 container mx-auto py-12 px-6">
-                {/* Page Title */}
-                <h1 className="text-5xl font-extrabold mb-10 text-cyan-200 drop-shadow-lg">
+            <main className="relative z-10 container mx-auto py-10 px-4 sm:px-6 lg:px-8">
+                <h1 className="text-4xl md:text-5xl font-extrabold mb-8 text-cyan-300 text-center md:text-left">
                     My Bills
                 </h1>
 
-                {/* Bills Table Card */}
-                <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-lg border border-cyan-500/30 p-8 rounded-2xl shadow-2xl shadow-cyan-500/20">
+                <div className="bg-slate-800/90 border border-cyan-600/40 p-6 md:p-8 rounded-2xl shadow-xl hover:shadow-cyan-500/20 transition-all duration-300">
                     {bills.length === 0 ? (
                         <div className="text-center py-16">
-                            <p className="text-2xl text-slate-300">
+                            <p className="text-xl md:text-2xl text-slate-300">
                                 No billing records found.
                             </p>
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="min-w-full">
-                                {/* Table Header */}
+                            <table className="min-w-full text-sm md:text-base">
                                 <thead>
                                     <tr className="border-b-2 border-cyan-500/40">
-                                        <th className="px-6 py-4 text-left text-sm font-bold text-cyan-300 uppercase tracking-wider">
+                                        <th className="px-4 md:px-6 py-3 text-left font-bold text-cyan-300 uppercase tracking-wider">
                                             Bill ID
                                         </th>
-                                        <th className="px-6 py-4 text-left text-sm font-bold text-cyan-300 uppercase tracking-wider">
+                                        <th className="px-4 md:px-6 py-3 text-left font-bold text-cyan-300 uppercase tracking-wider">
                                             Date
                                         </th>
-                                        <th className="px-6 py-4 text-left text-sm font-bold text-cyan-300 uppercase tracking-wider">
+                                        <th className="px-4 md:px-6 py-3 text-left font-bold text-cyan-300 uppercase tracking-wider">
                                             Services
                                         </th>
-                                        <th className="px-6 py-4 text-right text-sm font-bold text-cyan-300 uppercase tracking-wider">
+                                        <th className="px-4 md:px-6 py-3 text-right font-bold text-cyan-300 uppercase tracking-wider">
                                             Amount
                                         </th>
-                                        <th className="px-6 py-4 text-center text-sm font-bold text-cyan-300 uppercase tracking-wider">
+                                        <th className="px-4 md:px-6 py-3 text-center font-bold text-cyan-300 uppercase tracking-wider">
                                             Status
                                         </th>
-                                        <th className="px-6 py-4 text-center text-sm font-bold text-cyan-300 uppercase tracking-wider">
+                                        <th className="px-4 md:px-6 py-3 text-center font-bold text-cyan-300 uppercase tracking-wider">
                                             Action
                                         </th>
                                     </tr>
                                 </thead>
 
-                                {/* Table Body */}
                                 <tbody>
                                     {bills.map((bill) => (
                                         <tr 
                                             key={bill.bill_id} 
-                                            className={`border-b border-cyan-900/20 transition-all duration-300 ${
-                                                isUnpaid(bill.status) 
-                                                    ? 'bg-red-500/10 hover:bg-red-500/20' 
-                                                    : 'hover:bg-cyan-500/5'
+                                            className={`border-b border-slate-700 hover:bg-slate-700/60 transition-all ${
+                                                isUnpaid(bill.status) ? 'bg-red-500/5 hover:bg-red-500/15' : ''
                                             }`}
                                         >
-                                            {/* Bill ID */}
-                                            <td className="px-6 py-5 whitespace-nowrap">
-                                                <span className="text-base font-bold text-cyan-400">
-                                                    #{bill.bill_id}
-                                                </span>
+                                            <td className="px-4 md:px-6 py-4 font-semibold text-cyan-400">
+                                                #{bill.bill_id}
                                             </td>
-
-                                            {/* Date */}
-                                            <td className="px-6 py-5 whitespace-nowrap">
-                                                <span className="text-base text-slate-200">
-                                                    {new Date(bill.created_at).toLocaleDateString('en-IN', {
-                                                        day: '2-digit',
-                                                        month: 'short',
-                                                        year: 'numeric'
-                                                    })}
-                                                </span>
+                                            <td className="px-4 md:px-6 py-4">
+                                                {new Date(bill.created_at).toLocaleDateString('en-IN', {
+                                                    day: '2-digit',
+                                                    month: 'short',
+                                                    year: 'numeric'
+                                                })}
                                             </td>
-
-                                            {/* Services */}
-                                            <td className="px-6 py-5">
-                                                <span className="text-base text-slate-100">
-                                                    {bill.services}
-                                                </span>
+                                            <td className="px-4 md:px-6 py-4">
+                                                {bill.services}
                                             </td>
-
-                                            {/* Amount */}
-                                            <td className="px-6 py-5 whitespace-nowrap text-right">
-                                                <span className="text-lg font-bold text-cyan-300">
-                                                    ₹{bill.total_amount.toFixed(2)}
-                                                </span>
+                                            <td className="px-4 md:px-6 py-4 text-right font-bold text-cyan-300">
+                                                ₹{bill.total_amount.toFixed(2)}
                                             </td>
-
-                                            {/* Status Badge */}
-                                            <td className="px-6 py-5 whitespace-nowrap text-center">
-                                                <span className={`px-4 py-2 inline-flex text-sm font-bold rounded-full ${
+                                            <td className="px-4 md:px-6 py-4 text-center">
+                                                <span className={`px-3 py-1 inline-flex text-xs md:text-sm font-bold rounded-full ${
                                                     bill.status === 'Paid'
-                                                        ? 'bg-emerald-500/30 text-emerald-200 border-2 border-emerald-400/50 shadow-lg shadow-emerald-500/30'
+                                                        ? 'bg-emerald-500/30 text-emerald-200 border border-emerald-400/50'
                                                         : isUnpaid(bill.status)
-                                                        ? 'bg-red-500/30 text-red-200 border-2 border-red-400/50 shadow-lg shadow-red-500/30'
-                                                        : 'bg-amber-500/30 text-amber-200 border-2 border-amber-400/50 shadow-lg shadow-amber-500/30'
+                                                        ? 'bg-red-500/30 text-red-200 border border-red-400/50'
+                                                        : 'bg-amber-500/30 text-amber-200 border border-amber-400/50'
                                                 }`}>
                                                     {bill.status}
                                                 </span>
                                             </td>
-
-                                            {/* Action Button */}
-                                            <td className="px-6 py-5 whitespace-nowrap text-center">
+                                            <td className="px-4 md:px-6 py-4 text-center">
                                                 {isUnpaid(bill.status) ? (
                                                     <button
                                                         onClick={() => handlePayment(bill)}
                                                         disabled={isProcessing}
-                                                        className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-2.5 px-6 rounded-full font-bold hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-110 shadow-lg shadow-emerald-500/50 hover:shadow-emerald-500/70 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                                        className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-2 px-4 md:px-6 rounded-full font-semibold hover:scale-105 hover:from-emerald-600 hover:to-teal-600 transition-transform shadow-md hover:shadow-emerald-400/50 disabled:opacity-50"
                                                     >
                                                         {isProcessing ? 'Processing...' : 'Pay Now'}
                                                     </button>

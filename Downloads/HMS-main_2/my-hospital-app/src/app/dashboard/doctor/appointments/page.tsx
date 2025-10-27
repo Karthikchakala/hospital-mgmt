@@ -127,7 +127,7 @@ export default function DoctorAppointmentsPage() {
 
     return (
         <div className="relative min-h-screen bg-slate-900 text-slate-100 overflow-hidden">
-            <ParticlesBackground />
+            {/* <ParticlesBackground /> */}
 
             <div className="relative z-10">
                 <DashboardNavbar 
@@ -154,8 +154,8 @@ export default function DoctorAppointmentsPage() {
                                     key={appt.appointment_id}
                                     className={`backdrop-blur-sm p-6 rounded-xl border-l-4 transition-all duration-300 hover:scale-[1.01] ${
                                         appt.status === 'Completed' 
-                                            ? 'bg-gradient-to-br from-emerald-900/50 to-teal-900/50 border-emerald-400 shadow-lg shadow-emerald-500/20' 
-                                            : 'bg-gradient-to-br from-purple-900/50 via-violet-900/50 to-fuchsia-900/50 border-purple-400 shadow-lg shadow-purple-500/20'
+                                            ? 'bg-gradient-to-br from-emerald-600/50 to-teal-600/50 border-emerald-400 shadow-lg shadow-emerald-500/20' 
+                                            : 'bg-gradient-to-br from-purple-600/50 via-violet-600/50 to-fuchsia-900/50 border-purple-400 shadow-lg shadow-purple-500/20'
                                     }`}
                                 >
                                     <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">

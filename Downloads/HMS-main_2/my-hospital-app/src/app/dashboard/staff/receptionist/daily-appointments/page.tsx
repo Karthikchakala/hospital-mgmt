@@ -72,7 +72,7 @@ export default function ReceptionistDailyAppointmentsPage() {
     return (
         <div className="relative min-h-screen bg-slate-900 text-slate-100 overflow-hidden">
             {/* ✅ Plexus Background */}
-            <ParticlesBackground />
+            {/* <ParticlesBackground /> */}
 
             <div className="relative z-10">
                 <DashboardNavbar 

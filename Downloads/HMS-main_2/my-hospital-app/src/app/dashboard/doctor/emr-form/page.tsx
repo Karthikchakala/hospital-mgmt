@@ -214,7 +214,7 @@ export default function NewEMRPage() {
 
   return (
     <div className="relative min-h-screen bg-slate-900 text-slate-100 overflow-hidden">
-      <ParticlesBackground />
+      {/* <ParticlesBackground /> */}
 
       <DashboardNavbar title="Doctor Portal" navLinks={[]} userName={doctorName} />
 
@@ -224,7 +224,7 @@ export default function NewEMRPage() {
         </h1>
         <p className="mb-8 text-cyan-300">Attending Physician: Dr. {doctorName}</p>
 
-        <div className="bg-slate-800/80 backdrop-blur-md border border-cyan-700/30 p-8 rounded-2xl shadow-2xl max-w-4xl mx-auto">
+        <div className="bg-slate-800/80 backdrop-blur-md border border-cyan-700/60 p-10 rounded-2xl shadow-2xl max-w-4xl mx-auto">
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Patient Dropdown */}
             <div>

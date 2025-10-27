@@ -80,6 +80,14 @@ export default function LabTechnicianDashboard() {
               borderColor="border-indigo-400"
               icon={ClipboardDocumentListIcon}
             />
+            <TaskCard
+              title="Feedback & Help"
+              description="Share your thoughts to help us serve you better."
+              link="/dashboard/feedback"
+              gradient="from-pink-500/30 to-pink-500/30"
+              borderColor="border-pink-400"
+              icon={ClipboardDocumentListIcon}
+            />
           </div>
         </main>
       </div>

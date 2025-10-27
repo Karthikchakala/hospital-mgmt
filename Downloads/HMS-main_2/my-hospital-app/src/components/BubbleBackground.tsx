@@ -15,7 +15,7 @@ export default function ParticlesBackground() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const numParticles = 520; // denser network
+    const numParticles = 400; // denser network
     const maxVelocity = 0.6; // smoother floating movement
     const connectThreshold = 90; // tighter proximity connecting lines
     const closeConnect = 70; // secondary layer for strong inner links
