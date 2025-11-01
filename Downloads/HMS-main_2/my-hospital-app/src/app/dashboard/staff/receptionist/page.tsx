@@ -23,6 +23,9 @@ export default function ReceptionistDashboard() {
       { name: 'Dashboard', href: '/dashboard/staff/receptionist' },
       { name: 'Register Patient', href: '/dashboard/staff/receptionist/patient-registration' },
       { name: 'Appointments', href: '/dashboard/staff/receptionist/daily-appointments' },
+      { name: 'Home Visits', href: '/dashboard/staff/receptionist/home-visit' },
+      { name: 'Inpatients', href: '/dashboard/staff/inpatients' },
+      { name: 'Outpatients', href: '/dashboard/staff/outpatients' },
   ];
 
   useEffect(() => {
@@ -126,12 +129,36 @@ export default function ReceptionistDashboard() {
               icon={UserPlusIcon}
             />
             <TaskCard
+              title="Inpatients (Admit/Discharge)"
+              description="Admit patients, manage rooms and discharge when complete."
+              link="/dashboard/staff/inpatients"
+              gradient="from-cyan-500/30 to-sky-500/30"
+              borderColor="border-cyan-400"
+              icon={ClipboardDocumentListIcon}
+            />
+            <TaskCard
+              title="Outpatients (Book/Manage)"
+              description="Book outpatient visits and manage payment status."
+              link="/dashboard/staff/outpatients"
+              gradient="from-teal-500/30 to-emerald-500/30"
+              borderColor="border-emerald-400"
+              icon={CalendarDaysIcon}
+            />
+            <TaskCard
               title="Daily Appointments"
               description="View the current day's appointment schedule for all doctors and departments."
               link="/dashboard/staff/receptionist/daily-appointments"
               gradient="from-teal-500/30 to-cyan-500/30"
               borderColor="border-teal-400"
               icon={CalendarDaysIcon}
+            />
+            <TaskCard
+              title="Home Visits (Non-Doctor)"
+              description="Assign and manage nurse, physiotherapist, and caregiver home visits."
+              link="/dashboard/staff/receptionist/home-visit"
+              gradient="from-indigo-500/30 to-blue-500/30"
+              borderColor="border-indigo-400"
+              icon={ClipboardDocumentListIcon}
             />
             <TaskCard
               title="Feedback & Help"

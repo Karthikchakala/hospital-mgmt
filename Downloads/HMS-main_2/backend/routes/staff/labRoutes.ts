@@ -2,6 +2,7 @@
 // import { Router, Request, Response, NextFunction } from 'express';
 // import { protect } from '../../middleware/authMiddleware';
 // import { supabase } from '../../db';
+import { sendMail } from '../../mailer/transport';
 
 // const router = Router();
 
@@ -346,51 +347,84 @@ console.log("=========================================");
 });
 
 // @route   PUT /api/staff/lab/result/:testId
-// @desc    Update a lab test with the result and mark as completed
+// @desc    Update a lab test with the result, mark as completed, and email the patient
 // @access  Private (Staff Only)
-// router.put('/lab/result/:testId', protect, restrictToLab, async (req: AuthRequest, res: Response) => {
-//     try {
-//         const userId = req.user?.id;
-//         const testId = req.params.testId;
-//         const { resultValue, unit } = req.body;
-        
-//         // 1. Get the technician's actual staff_id
-//         const technicianId = userId ? await getStaffId(userId) : null; 
+router.put('/lab/result/:testId', protect, restrictToLab, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const testId = req.params.testId;
+    const { resultValue, unit } = req.body;
 
-//         if (!technicianId) {
-//             return res.status(403).json({ message: 'Technician ID not found.' });
-//         }
-        
-//         // CRITICAL FIX: Convert the URL parameter to a number
-//         const numericTestId = parseInt(testId);
-//         if (isNaN(numericTestId)) {
-//             return res.status(400).json({ message: 'Invalid Test ID format.' });
-//         }
-        
-//         // 2. Execute the update query
-//         const { data: updatedTest, error } = await supabase
-//             .from('LabTests')
-//             .update({
-//                 result_value: resultValue,
-//                 unit: unit,
-//                 status: 'Completed',
-//                 technician_id: technicianId,
-//             })
-//             .eq('lab_test_id', numericTestId) // Use the correct PK name
-//             .select();
+    const technicianId = userId ? await getStaffId(userId) : null;
+    if (!technicianId) return res.status(403).json({ message: 'Technician ID not found.' });
 
-//         if (error) throw error;
+    const numericTestId = parseInt(testId);
+    if (isNaN(numericTestId)) return res.status(400).json({ message: 'Invalid Test ID format.' });
 
-//         if (!updatedTest || updatedTest.length === 0) {
-//             return res.status(404).json({ message: 'Test not found or already completed.' });
-//         }
+    // Update test to Completed with result
+    const { data: updatedTest, error } = await supabase
+      .from('LabTests')
+      .update({
+        result_value: resultValue,
+        unit: unit,
+        status: 'Completed',
+        technician_id: technicianId,
+      })
+      .eq('lab_test_id', numericTestId)
+      .select('*');
 
-//         res.status(200).json({ message: 'Test result submitted successfully', test: updatedTest[0] });
-//     } catch (err: any) {
-//         console.error('Test Result Update Error:', err);
-//         res.status(500).json({ message: 'Server error' });
-//     }
-// });
+    if (error) throw error;
+    if (!updatedTest || updatedTest.length === 0) return res.status(404).json({ message: 'Test not found or already completed.' });
+
+    // Fetch joins for email details (patient email, test name, normal range)
+    const { data: joined } = await supabase
+      .from('LabTests')
+      .select(`
+        lab_test_id,
+        result_value,
+        unit,
+        Patient:patient_id (
+          patient_id,
+          user_id,
+          User:user_id ( name, email )
+        ),
+        TestDetails:test_catalog_id ( test_name, normal_range )
+      `)
+      .eq('lab_test_id', numericTestId)
+      .single();
+
+    const to = (joined as any)?.Patient?.User?.email || (joined as any)?.Patient?.User?.[0]?.email;
+    const patientName = (joined as any)?.Patient?.User?.name || (joined as any)?.Patient?.User?.[0]?.name || 'Patient';
+    const testName = (joined as any)?.TestDetails?.test_name || 'Lab Test';
+    const normalRange = (joined as any)?.TestDetails?.normal_range || '—';
+    const valueStr = resultValue ? `${resultValue}${unit ? ' ' + unit : ''}` : '—';
+
+    if (to) {
+      const html = `
+        <div style="font-family:Arial,Helvetica,sans-serif">
+          <h2>Lab Report Ready</h2>
+          <p>Dear ${patientName},</p>
+          <p>Your lab test result is now available.</p>
+          <ul>
+            <li><b>Test:</b> ${testName}</li>
+            <li><b>Result:</b> ${valueStr}</li>
+            <li><b>Normal Range:</b> ${normalRange}</li>
+          </ul>
+          <p>— Hospify</p>
+        </div>`;
+      try {
+        await sendMail({ to, subject: 'Your Lab Report is Ready', html });
+      } catch (e:any) {
+        console.error('[Lab] Failed to send lab report email:', e?.message || e);
+      }
+    }
+
+    return res.status(200).json({ message: 'Test result submitted successfully', test: updatedTest[0] });
+  } catch (err:any) {
+    console.error('Test Result Update Error:', err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
 
 router.get('/lab/samples', protect, restrictToLab, async (req: AuthRequest, res: Response) => {
   try {

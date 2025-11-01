@@ -42,13 +42,13 @@ export default function Footer() {
               Quick Links
             </h4>
             <ul className="space-y-3">
-              {['About Us', 'Our Services', 'Contact'].map((item, idx) => (
+              {[{label:'About Us',href:'/about'},{label:'Our Services',href:'/services'},{label:'Contact',href:'/contact'},{label:'FAQ',href:'/faq'}].map((item, idx) => (
                 <li key={idx}>
                   <Link
-                    href={`/${item.toLowerCase().replace(/\s/g, '')}`}
+                    href={item.href}
                     className="hover:text-cyan-400 transition duration-300 transform hover:translate-x-1 inline-block"
                   >
-                    {item}
+                    {item.label}
                   </Link>
                 </li>
               ))}
@@ -61,13 +61,13 @@ export default function Footer() {
               Support
             </h4>
             <ul className="space-y-3">
-              {['FAQ', 'Privacy Policy', 'Terms of Use'].map((item, idx) => (
+              {[{label:'FAQ',href:'/faq'},{label:'Privacy Policy',href:'/privacypolicy'},{label:'Terms of Use',href:'/termsofuse'}].map((item, idx) => (
                 <li key={idx}>
                   <Link
-                    href={`/${item.toLowerCase().replace(/\s/g, '')}`}
+                    href={item.href}
                     className="hover:text-blue-400 transition duration-300 transform hover:translate-x-1 inline-block"
                   >
-                    {item}
+                    {item.label}
                   </Link>
                 </li>
               ))}

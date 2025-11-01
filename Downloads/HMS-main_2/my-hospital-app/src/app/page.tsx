@@ -1,6 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Map from '../components/Map';
@@ -11,8 +13,35 @@ import SignupBoxes from '../components/SignupBoxes';
 import Image from 'next/image';
 import Link from 'next/link';
 import ParticlesBackground from '../components/BubbleBackground';
+import HospifyChatbot from '../components/HospifyChatbot';
+import HospitalPopup from '../components/HospitalPopup';
 
 export default function LandingPage() {
+  const [doctors, setDoctors] = useState<any[]>([]);
+  const [docsLoading, setDocsLoading] = useState(false);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setDocsLoading(true);
+        const cache = sessionStorage.getItem('landing_doctors');
+        if (cache) {
+          const parsed = JSON.parse(cache);
+          if (mounted) setDoctors(parsed);
+        } else {
+          const BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5000';
+          const { data } = await axios.get(`${BASE}/api/doctors`);
+          const items = data?.data || [];
+          if (mounted) {
+            setDoctors(items);
+            sessionStorage.setItem('landing_doctors', JSON.stringify(items));
+          }
+        }
+      } catch {
+      } finally { setDocsLoading(false); }
+    })();
+    return () => { mounted = false; };
+  }, []);
   return (
     <div className="relative min-h-screen font-sans text-white overflow-hidden bg-gradient-to-br from-sky-950 via-slate-900 to-teal-950">
       <main>
@@ -28,59 +57,7 @@ export default function LandingPage() {
           <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-black/10 to-transparent" />
 
           {/* Navbar */}
-          <motion.nav
-            initial={{ y: -50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="absolute top-6 left-1/2 z-50 w-[95%] md:w-[90%] 
-                       -translate-x-1/2 bg-transparent backdrop-blur-sm 
-                       rounded-3xl px-6 py-4 md:px-10 flex items-center justify-between"
-          >
-            <Link
-              href="/"
-              className="flex items-center gap-3 transition-transform duration-300 hover:scale-105"
-            >
-              <Image
-                src="/images/HMS.ico"
-                alt="Hospital Logo"
-                width={50}
-                height={50}
-                className="rounded-full object-cover"
-              />
-              <span className="text-4xl font-extrabold tracking-tight text-cyan-300">
-                Hospify
-              </span>
-            </Link>
-
-
-            <div className="hidden md:flex items-center gap-8 ml-auto text-[17px] font-medium">
-              <Link
-              href="/"
-              className="text-xl text-neutral-700 dark:text-neutral-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-              >
-              Home
-              </Link>
-              {['About', 'Services', 'Contact'].map((item, i) => (
-                <Link
-                  key={i}
-                  href={`/${item.toLowerCase()}`}
-                  className="text-gray-200 hover:text-cyan-300 transition-colors"
-                >
-                  {item}
-                </Link>
-              ))}
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-                <Link
-                  href="/login"
-                  className="px-5 py-2 rounded-full bg-gradient-to-r from-cyan-400 
-                             to-teal-400 text-white font-semibold shadow-md 
-                             hover:shadow-cyan-400/50 transition-all"
-                >
-                  Login
-                </Link>
-              </motion.div>
-            </div>
-          </motion.nav>
+          <Navbar />
 
           {/* Hero Text */}
           <div className="relative z-10 flex flex-col justify-center h-full px-6 md:px-16 max-w-4xl">
@@ -131,7 +108,7 @@ export default function LandingPage() {
         {/* ===== PARTICLE ANIMATION AFTER HERO ONLY ===== */}
         <div className="relative overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <ParticlesBackground />
+            {/* <ParticlesBackground /> */}
           </div>
 
           {/* Signup Section */}
@@ -141,12 +118,51 @@ export default function LandingPage() {
             </div>
           </section>
 
-          {/* Departments */}
+          
+
+          {/* Meet Our Doctors (removed) */}
+          {/**
+          <section className="container mx-auto py-20 px-4 md:px-6 lg:px-8 relative z-10">
+            <h2 className="text-4xl font-bold text-center text-cyan-300 mb-12">
+              Meet Our Doctors
+            </h2>
+            {docsLoading ? (
+              <div className="flex justify-center items-center py-10 text-slate-300">Loading…</div>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {doctors.slice(0, 6).map((d, i) => (
+                  <motion.div
+                    key={d.doctor_id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="p-6 bg-gradient-to-br from-blue-50/10 to-white/5 border border-cyan-700/40 rounded-2xl shadow-md hover:shadow-cyan-400/20 hover:scale-105 transition"
+                 >
+                    <div className="flex items-center gap-4">
+                      <div className="h-14 w-14 rounded-full overflow-hidden border border-cyan-700/50 bg-slate-800">
+                        <img src={d.profile_image || '/images/doctor-placeholder.png'} alt={d.doctor_name} className="h-full w-full object-cover" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-white">{d.doctor_name || `Doctor #${d.doctor_id}`}</div>
+                        <div className="text-sm text-blue-300">{d.department_name || 'General'}</div>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <Link href={`/doctors/${d.doctor_id}`} className="inline-block text-sm font-semibold text-cyan-300 hover:text-cyan-200 underline underline-offset-2">View Profile →</Link>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </section>
+          */}
+
+          {/* Departments
           <section className="container mx-auto px-4 md:px-6 lg:px-8 pt-10 relative z-10">
             <div className="rounded-3xl bg-white/5 border border-cyan-700 backdrop-blur-md p-4 md:p-6">
               <Departments />
             </div>
-          </section>
+          </section> */}
 
           {/* Services */}
           <section className="container mx-auto py-20 px-4 md:px-6 lg:px-8 relative z-10">
@@ -193,9 +209,45 @@ export default function LandingPage() {
           <div className="bg-gradient-to-r from-teal-950 to-sky-950 border-t border-teal-800 relative z-10">
             <Map />
           </div>
+          
+          {/* Ask Our Experts - just above footer */}
+          <section className="relative z-10 py-16">
+            <div className="container mx-auto px-4 md:px-6 lg:px-8">
+              <div className="p-8">
+                <h3 className="text-3xl md:text-4xl font-bold text-center text-cyan-300 mb-3">Ask Our Experts</h3>
+                <p className="max-w-3xl mx-auto text-center text-slate-300 mb-8">
+                  Unlock answers, gain insights: Engage with our esteemed experts who provide valuable guidance, expert advice, and personalized solutions to address your queries and empower your decision-making process.
+                </p>
+                <form
+                  onSubmit={(e)=>{e.preventDefault();}}
+                  className="max-w-3xl mx-auto"
+                >
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Ask your query here"
+                      className="w-full rounded-full bg-white/95 border border-purple-200 px-5 py-4 pr-16 text-slate-800 placeholder:text-slate-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+                    />
+                    <button
+                      type="submit"
+                      aria-label="Search"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-md hover:bg-purple-700"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6">
+                        <path fillRule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 4.2 12.06l4.22 4.22a.75.75 0 1 0 1.06-1.06l-4.22-4.22A6.75 6.75 0 0 0 10.5 3.75Zm-5.25 6.75a5.25 5.25 0 1 1 10.5 0 5.25 5.25 0 0 1-10.5 0Z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
+
           <Footer />
         </div>
       </main>
+      <HospifyChatbot />
+      <HospitalPopup />
     </div>
   );
 }

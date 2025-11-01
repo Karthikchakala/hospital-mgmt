@@ -10,10 +10,14 @@ import patientProfileRoutes from './routes/patient/profileRoutes';
 import patientAppointmentRoutes from './routes/patient/appointmentRoutes';
 import medicalHistoryRoutes from './routes/patient/medicalHistoryRoutes';
 import billingRoutes from './routes/patient/billingRoutes';
+import patientStatusRoutes from './routes/patient/statusRoutes';
+import inpatientsRoutes from './routes/patient/inpatientsRoutes';
+import outpatientsRoutes from './routes/patient/outpatientsRoutes';
 import doctorProfileRoutes from './routes/doctor/profileRoutes';
 import doctorAppointmentRoutes from './routes/doctor/appointmentRoutes';
 import doctorUploadRoutes from './routes/doctor/uploadRoutes'; // NEW IMPORT
 import doctorEmrRoutes from './routes/doctor/emrRoutes';
+import { startAppointmentReminderJob } from './jobs/appointmentReminder';
 
 
 // --- Admin Module Imports (CRITICAL SECTION) ---
@@ -28,7 +32,12 @@ import pharmacyRoutes from './routes/staff/pharmacyRoutes';
 import dailyAppointmentsRoutes from './routes/staff/dailyAppointmentsRoutes';
 import adminDepartmentRoutes from './routes/admin/departmentsRoutes';
 import adminSettingsRoutes from './routes/admin/settingsRoutes';
+import inventoryRoutes from './routes/staff/inventoryRoutes';
+import homeVisitRoutes from './routes/homeVisitRoutes';
+import notificationsRoutes from './routes/notifications/notificationsRoutes';
 import adminAuditRoutes from './routes/admin/auditRoutes';
+import { startHomeVisitReminderJob } from './jobs/homeVisitReminder';
+import publicDoctorsRoutes from './routes/public/doctorsRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -38,16 +47,19 @@ app.use(cors());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/utils', utilsRoutes);
+app.use('/api', publicDoctorsRoutes);
 
 // --- Patient Routes ---
 app.use('/api/patient', patientProfileRoutes);
 app.use('/api/patient', patientAppointmentRoutes);
 app.use('/api/patient', medicalHistoryRoutes);
 app.use('/api/patient', billingRoutes);
+app.use('/api/patient', patientStatusRoutes);
+
 
 // --- Doctor Routes ---
 app.use('/api/doctor', doctorProfileRoutes);
-// console.log("✅ Doctor profile routes loaded");
+// console.log(" Doctor profile routes loaded");
 app.use('/api/doctor', doctorAppointmentRoutes);
 app.use('/api/doctor', doctorUploadRoutes); // NEW LINE
 app.use('/api/doctor', doctorEmrRoutes);
@@ -68,7 +80,17 @@ app.use('/api/staff', patientRegistrationRoutes);
 app.use('/api/admin', adminAuditRoutes);
 app.use('/api/staff', pharmacyRoutes);
 app.use('/api/staff', dailyAppointmentsRoutes);
+app.use('/api/staff', inpatientsRoutes);
+app.use('/api/staff', outpatientsRoutes);
+// New Node-based routes
+app.use('/api/staff', inventoryRoutes);
+app.use('/api', homeVisitRoutes);
+app.use('/api/notifications', notificationsRoutes);
 
+
+// Start background jobs
+startAppointmentReminderJob();
+startHomeVisitReminderJob();
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

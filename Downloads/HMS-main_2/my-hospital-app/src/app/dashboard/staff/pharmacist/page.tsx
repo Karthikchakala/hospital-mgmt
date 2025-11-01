@@ -115,7 +115,7 @@ export default function PharmacistDashboard() {
             <p className="text-slate-400 text-xl">Pharmacist Portal - Dispense & Manage Medications</p>
           </div>
 
-          <div className="grid md:grid-cols-1 gap-8 max-w-2xl">
+          <div className="grid md:grid-cols-2 gap-8">
             <TaskCard
               title="Dispense & Billing"
               description="Process prescriptions, dispense medicine to patients, and finalize patient billing statements."
@@ -123,6 +123,14 @@ export default function PharmacistDashboard() {
               gradient="from-emerald-500/30 to-teal-500/30"
               borderColor="border-emerald-400"
               icon={PlusCircleIcon}
+            />
+            <TaskCard
+              title="Medicine Inventory"
+              description="Add, update, and track medicine stock levels, with search, sorting, and low-stock highlights."
+              link="/dashboard/staff/pharmacist/inventory"
+              gradient="from-sky-500/30 to-blue-500/30"
+              borderColor="border-sky-400"
+              icon={ClipboardDocumentListIcon}
             />
             <TaskCard
               title="Feedback & Help"

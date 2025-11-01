@@ -72,6 +72,15 @@ export default function PatientDashboard() {
       link: '/dashboard/patient/appointments',
     },
     {
+      title: 'Home Appointments',
+      desc: 'Book doctor or nursing home visits and track their status.',
+      gradient: 'from-indigo-400/30 via-blue-400/20 to-indigo-500/30',
+      border: 'border-indigo-300/30',
+      glow: 'hover:shadow-indigo-400/40',
+      text: 'text-indigo-200',
+      link: '/dashboard/patient/home-visit',
+    },
+    {
       title: 'Profile',
       desc: 'View and update your account and medical details.',
       gradient: 'from-teal-400/30 via-emerald-400/20 to-green-500/30', // soft teal/green

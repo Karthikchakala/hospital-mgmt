@@ -2,6 +2,7 @@
 // import { Router, Request, Response } from 'express';
 // import { protect } from '../../middleware/authMiddleware';
 // import { supabase } from '../../db';
+import { sendMail } from '../../mailer/transport';
 
 // const router = Router();
 
@@ -146,6 +147,43 @@ router.post('/emr', protect, async (req: AuthRequest, res: Response) => {
             .select();
 
         if (error) throw error;
+
+        // Fire-and-forget EMR summary email to patient
+        try {
+            const { data: patientJoin } = await supabase
+                .from('Patient')
+                .select('patient_id, User(name,email)')
+                .eq('patient_id', patientId)
+                .single();
+            const { data: doctorJoin } = await supabase
+                .from('Doctor')
+                .select('doctor_id, User(name)')
+                .eq('doctor_id', doctorId)
+                .single();
+            const to = (patientJoin as any)?.User?.[0]?.email;
+            const patientName = (patientJoin as any)?.User?.[0]?.name || 'Patient';
+            const doctorName = (doctorJoin as any)?.User?.[0]?.name || 'Doctor';
+            if (to) {
+                const html = `
+                  <div style="font-family:Arial,Helvetica,sans-serif">
+                    <h2>Your Visit Summary</h2>
+                    <p>Dear ${patientName},</p>
+                    <p>Here is the summary from your recent consultation.</p>
+                    <ul>
+                      <li><b>Doctor:</b> ${doctorName}</li>
+                      <li><b>Diagnosis:</b> ${diagnosis || '—'}</li>
+                      <li><b>Prescriptions:</b> ${prescriptions || '—'}</li>
+                    </ul>
+                    <p><b>Notes:</b></p>
+                    <p>${(notes || '').toString()}</p>
+                    ${fileMetadata?.url ? `<p><a href="${fileMetadata.url}">Attached document</a></p>` : ''}
+                    <p>— Hospify</p>
+                  </div>`;
+                await sendMail({ to, subject: 'Visit Summary', html });
+            }
+        } catch (e) {
+            console.error('[EMR] Summary email failed:', (e as any)?.message || e);
+        }
 
         res.status(201).json({ 
             message: 'EMR created and document linked successfully', 

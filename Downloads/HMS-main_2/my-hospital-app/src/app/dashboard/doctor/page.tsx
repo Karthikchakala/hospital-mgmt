@@ -103,6 +103,15 @@ export default function DoctorDashboard() {
       link: '/dashboard/doctor/appointments',
     },
     {
+      title: 'Home Visits',
+      desc: 'See and manage home visit appointments assigned to you.',
+      gradient: 'from-indigo-400/30 via-blue-400/20 to-indigo-500/30',
+      border: 'border-indigo-300/30',
+      glow: 'hover:shadow-indigo-400/40',
+      text: 'text-indigo-200',
+      link: '/dashboard/doctor/home-visit',
+    },
+    {
       title: 'My Patients',
       desc: 'Access a list of your patients and their medical records.',
       gradient: 'from-purple-400/30 via-violet-400/20 to-indigo-500/30',
