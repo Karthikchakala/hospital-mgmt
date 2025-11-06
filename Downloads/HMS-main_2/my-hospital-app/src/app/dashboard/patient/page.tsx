@@ -81,6 +81,15 @@ export default function PatientDashboard() {
       link: '/dashboard/patient/home-visit',
     },
     {
+      title: 'Virtual Appointments',
+      desc: 'Join your scheduled online consultations via secure video call.',
+      gradient: 'from-violet-400/30 via-purple-400/20 to-fuchsia-500/30',
+      border: 'border-violet-300/30',
+      glow: 'hover:shadow-violet-400/40',
+      text: 'text-violet-200',
+      link: '/dashboard/patient/appointments',
+    },
+    {
       title: 'Profile',
       desc: 'View and update your account and medical details.',
       gradient: 'from-teal-400/30 via-emerald-400/20 to-green-500/30', // soft teal/green

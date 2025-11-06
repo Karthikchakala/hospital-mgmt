@@ -38,6 +38,7 @@ import notificationsRoutes from './routes/notifications/notificationsRoutes';
 import adminAuditRoutes from './routes/admin/auditRoutes';
 import { startHomeVisitReminderJob } from './jobs/homeVisitReminder';
 import publicDoctorsRoutes from './routes/public/doctorsRoutes';
+import publicVideoRoutes from './routes/public/videoRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -48,6 +49,7 @@ app.use(cors());
 app.use('/api/auth', authRoutes);
 app.use('/api/utils', utilsRoutes);
 app.use('/api', publicDoctorsRoutes);
+app.use('/api', publicVideoRoutes);
 
 // --- Patient Routes ---
 app.use('/api/patient', patientProfileRoutes);

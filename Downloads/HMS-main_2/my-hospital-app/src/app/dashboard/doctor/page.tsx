@@ -103,6 +103,15 @@ export default function DoctorDashboard() {
       link: '/dashboard/doctor/appointments',
     },
     {
+      title: 'Virtual Appointments',
+      desc: 'View and join your scheduled virtual consultations.',
+      gradient: 'from-violet-400/30 via-purple-400/20 to-fuchsia-500/30',
+      border: 'border-violet-300/30',
+      glow: 'hover:shadow-violet-400/40',
+      text: 'text-violet-200',
+      link: '/dashboard/doctor/appointments',
+    },
+    {
       title: 'Home Visits',
       desc: 'See and manage home visit appointments assigned to you.',
       gradient: 'from-indigo-400/30 via-blue-400/20 to-indigo-500/30',

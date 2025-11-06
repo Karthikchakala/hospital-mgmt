@@ -160,6 +160,13 @@ export default function AppointmentsPage() {
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      try {
+        await axios.post(
+          'http://localhost:5000/api/video/invite',
+          { doctorId: selectedDoctor, roomId: `appt-${orderId}`, paymentMode: 'Razorpay' },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } catch {}
       alert('✅ Appointment booked successfully! Check your bills.');
       router.push('/dashboard/patient/bills');
     } catch (error) {
